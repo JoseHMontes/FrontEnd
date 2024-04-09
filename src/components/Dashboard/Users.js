@@ -51,7 +51,7 @@ function Users() {
   const addUser = async () => {
     if (newUser.name.trim() !== '' && newUser.email.trim() !== '' && newUser.password.trim() !== '') {
       try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/users', {
+        const response = await fetch('http://localhost:8000/api-auth/register/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -63,7 +63,6 @@ function Users() {
         });
         const data = await response.json();
         setUsers([...users, data]);
-        setUserIdCounter(prevCounter => prevCounter + 1); // Incrementamos el contador de ID
         setNewUser({
           name: '',
           email: '',
@@ -93,14 +92,29 @@ function Users() {
 
   const getUsers = async () => {
     try {
-      const response = await fetch('https://jsonplaceholder.typicode.com/users');
-      const data = await response.json();
-      setUsers(data);
+      const token = localStorage.getItem('jwt'); // Obtener el token de autorización del almacenamiento local
+  
+      const response = await fetch('http://localhost:8000/api-auth/profile/allusers/', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error al obtener los usuarios');
+      }
+  
+      const usersData = await response.json(); // Convertir la respuesta a formato JSON
+  
+      setUsers(usersData); // Actualizar el estado de los usuarios con los datos recibidos
+  
+      console.log('Usuarios obtenidos correctamente:', usersData);
+  
     } catch (error) {
-      console.error('Error al obtener usuarios:', error);
+      console.error('Error al obtener los usuarios:', error);
     }
   };
-
+  
   return (
     <div>
       <NavBar/>

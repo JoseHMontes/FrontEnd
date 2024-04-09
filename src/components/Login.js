@@ -1,40 +1,15 @@
-import React from "react";
-import { makeStyles } from "@mui/styles";
-import { TextField, Button, Typography, Container } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-
-const theme = createTheme({});
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    minHeight: "100vh",
-    justifyContent: "center",
-    backgroundColor: "#2196f3",
-  },
-  form: {
-    width: "100%",
-    maxWidth: "400px",
-    padding: theme.spacing(2),
-    backgroundColor: "#ffffff",
-    borderRadius: theme.spacing(1),
-    boxShadow: theme.shadows[3],
-    "& > *": {
-      marginBottom: theme.spacing(2),
-    },
-  },
-}));
+import React, { useState } from "react";
+import "./Login/Login.css";
+import { FaRegUser } from 'react-icons/fa';
+import { RiLockPasswordLine } from 'react-icons/ri';
 
 function Users() {
-  const classes = useStyles();
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [setResponse] = React.useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [response, setResponse] = useState(""); // Corregido aquí
 
   const handleLogin = () => {
-    const url = "https://dummyjson.com/auth/login";
+    const url = "http://localhost:8000/api-auth/token/";
     const loginData = {
       username: username,
       password: password,
@@ -54,8 +29,8 @@ function Users() {
         return res.json();
       })
       .then((data) => {
+        localStorage.setItem('jwt', data.token);
         setResponse(JSON.stringify(data));
-
         console.log(
           "Usuario autenticado. Redirigiendo a la página de dashboard..."
         );
@@ -66,45 +41,52 @@ function Users() {
   };
 
   return (
-    <div className={classes.root}>
-      <Container component="main" maxWidth="xs">
-        <div className={classes.form}>
-          <Typography variant="h5" align="center" gutterBottom>
-            Iniciar Sesión
-          </Typography>
-          <TextField
-            label="Usuario"
-            fullWidth
+    <div className='login-container'>
+     <div className= "wrapper">
+      <form >
+        <h1>Login</h1>
+        <div className='input-box'>
+          <input
+            type='text'
+            placeholder='Username'
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            required
           />
-          <TextField
-            label="Contraseña"
-            type="password"
-            fullWidth
+          <FaRegUser className='icon' />
+        </div>
+        <div className='input-box'>
+          <input
+            type='password'
+            placeholder='Password'
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleLogin}
-          >
-            Iniciar Sesión
-          </Button>
+          <RiLockPasswordLine className='icon' />
         </div>
-      </Container>
+
+        <div className='remember-forgot'>
+          <label>
+            <input type='checkbox' />Remenber me
+          </label>
+          <a href='#'>Forgot password</a>
+        </div>
+
+        <button type='button' onClick={handleLogin}>Login</button> {/* Cambiado type a button */}
+        {/* Mostrar respuesta */}
+        {response && <p>{response}</p>}
+        
+        <div className='register-link'>
+          <p>
+            Don´t have an account? <a href='#'>Register</a>
+          </p>
+        </div>
+      </form>
+    </div>
+     
     </div>
   );
 }
 
-function UsersWithThemeProvider() {
-  return (
-    <ThemeProvider theme={theme}>
-      <Users />
-    </ThemeProvider>
-  );
-}
-
-export default UsersWithThemeProvider;
+export default Users;
